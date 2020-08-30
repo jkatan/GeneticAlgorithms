@@ -30,12 +30,35 @@ public abstract class GameClass {
         return equipment;
     }
 
-    public void setAttributes() {
-        setAttributesFromEquipmentList(equipment, attack, defense);
+    public void setAttack(double strength, double agility, double expertise) {
+        this.attack = (agility + expertise) * strength * attackModifier;
     }
 
-    public void setAttributesFromEquipmentList(List<Equipment> equipmentList, double attack, double defense) {
-        // todo
+    public void setDefense(double health, double resistance, double expertise) {
+        this.defense = (resistance + expertise) * health * defenseModifier;
+    }
+
+    public void setAttributes() {
+        setAttributesFromEquipmentList(equipment);
+    }
+
+    private void setAttributesFromEquipmentList(List<Equipment> equipmentList) {
+        double strength = 0, agility = 0, expertise = 0, resistance = 0, health = 0;
+        for (Equipment e: equipmentList) {
+            strength += e.getStrength();
+            agility += e.getAgility();
+            expertise += e.getExpertise();
+            resistance += e.getResistance();
+            health += e.getHealth();
+        }
+        strength = 100 * Math.tanh(0.01 * strength);
+        agility = Math.tanh(0.01 * agility);
+        expertise = 0.6 * Math.tanh(0.01 * expertise);
+        resistance = Math.tanh(0.01 * resistance);
+        health = 100 * Math.tanh(0.01 * health);
+
+        setAttack(strength, agility, expertise);
+        setDefense(health, resistance, expertise);
     }
 
     public abstract double getBestPerformance();
