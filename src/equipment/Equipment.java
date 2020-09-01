@@ -1,11 +1,19 @@
 package equipment;
 
 public class Equipment {
-    private double strength;
-    private double agility;
-    private double expertise;
-    private double resistance;
-    private double health;
+    private final double strength;
+    private final double agility;
+    private final double expertise;
+    private final double resistance;
+    private final double health;
+
+    public Equipment(double strength, double agility, double expertise, double resistance, double health) {
+        this.strength = strength;
+        this.agility = agility;
+        this.expertise = expertise;
+        this.resistance = resistance;
+        this.health = health;
+    }
 
     public double getStrength() {
         return strength;
@@ -25,5 +33,16 @@ public class Equipment {
 
     public double getHealth() {
         return health;
+    }
+
+    @Override
+    public String toString() {
+        return "Equipment{" +
+                "strength=" + strength +
+                ", agility=" + agility +
+                ", expertise=" + expertise +
+                ", resistance=" + resistance +
+                ", health=" + health +
+                '}';
     }
 }

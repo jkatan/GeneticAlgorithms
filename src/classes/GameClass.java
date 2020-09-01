@@ -20,10 +20,9 @@ public abstract class GameClass {
     public GameClass(double height, List<Equipment> equipment) {
         this.height = height;
         this.equipment = equipment;
-        this.attack = 0;
         this.attackModifier = 0.7 - Math.pow(3 * height - 5, 4) + Math.pow(3 * height - 5, 2) + height / 4;
-        this.defense = 0;
         this.defenseModifier = 1.9 + Math.pow(2.5 * height - 4.16, 4) - Math.pow(2.5 * height - 4.16, 2) - 3 * height / 10;
+        setAttributes();
     }
 
     public List<Equipment> getEquipment() {
