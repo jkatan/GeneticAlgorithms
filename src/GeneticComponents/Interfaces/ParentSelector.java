@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ParentSelector {
 
-    List<GameClass> selectParentsFromPopulation(List<GameClass> population);
+    List<GameClass> selectParentsFromPopulation(List<GameClass> population, int parentsAmount);
 }

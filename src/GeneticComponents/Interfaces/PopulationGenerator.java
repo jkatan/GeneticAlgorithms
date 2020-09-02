@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface PopulationGenerator {
 
-    List<GameClass> generateFromCurrentPopulation(List<GameClass> parents, List<GameClass> children);
+    List<GameClass> generateFromCurrentPopulation(List<GameClass> parents, List<GameClass> children, int amountToGenerate);
 }

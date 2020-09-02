@@ -1,3 +1,5 @@
+import GeneticComponents.Implementations.ParentSelectors.EliteSelector;
+import GeneticComponents.Implementations.ConditionCheckers.TimeConditionChecker;
 import GeneticComponents.Interfaces.*;
 import classes.*;
 import equipment.Equipment;
@@ -9,10 +11,20 @@ import java.util.List;
 public class FindBestCombination {
 
     private static ConditionChecker conditionChecker;
-    private static Mutator mutator;
-    private static ParentSelector parentSelector;
-    private static PopulationGenerator populationGenerator;
-    private static Reproductor reproductor;
+
+    private static Mutator mutator; // TODO: implement mutators
+
+    private static Reproductor reproductor; // TODO: implement reproductors
+
+    // TODO: implement the rest of the selectors
+    private static ParentSelector parentSelectorOne;
+    private static ParentSelector parentSelectorTwo;
+    private static double parentSelectorPercentage;
+
+    // TODO: implement population generators
+    private static PopulationGenerator populationGeneratorOne;
+    private static PopulationGenerator populationGeneratorTwo;
+    private static double populationGeneratorPercentage;
 
     private static File armasFile;
     private static File botasFile;
@@ -21,16 +33,33 @@ public class FindBestCombination {
     private static File pecherasFile;
 
     private static int initialPopulationSize;
+
+    // At the end of each generation, we select new individuals from the set of {Children + Parents}.
+    // This variable determines how many individuals will be selected from that set each generation
+    private static int populationAmountToSelect;
+
+    // Amount of parents that will be selected to cross and generate new children each generation
+    private static int parentsAmountToSelect;
+
     private static String classSelection;
 
     public static void main(String[] args) throws IOException {
-        initialPopulationSize = Integer.parseInt(args[1]);
-        armasFile = new File(args[2]);
-        botasFile = new File(args[3]);
-        cascosFile = new File(args[4]);
-        guantesFile = new File(args[5]);
-        pecherasFile = new File(args[6]);
-        classSelection = args[7];
+        initialPopulationSize = 200;
+
+        armasFile = new File(args[1]);
+        botasFile = new File(args[2]);
+        cascosFile = new File(args[3]);
+        guantesFile = new File(args[4]);
+        pecherasFile = new File(args[5]);
+        classSelection = args[6];
+
+        conditionChecker = new TimeConditionChecker(60.0);
+
+        parentSelectorOne = new EliteSelector();
+        parentSelectorTwo = new EliteSelector();
+        parentSelectorPercentage = 0.5;
+        parentsAmountToSelect = 100;
+
         findBestCombination();
     }
 
@@ -38,12 +67,49 @@ public class FindBestCombination {
         List<GameClass> parents;
         List<GameClass> children;
         List<GameClass> population = generateInitialPopulation();
+        conditionChecker.initialize();
         while (!conditionChecker.isConditionMet()) {
-            parents = parentSelector.selectParentsFromPopulation(population);
+            parents = selectParents(population);
             children = reproductor.cross(parents);
             mutator.mutate(children);
-            population = populationGenerator.generateFromCurrentPopulation(parents, children);
+            population = selectNextGeneration(parents, children);
         }
+    }
+
+    private static List<GameClass> selectParents(List<GameClass> population) {
+
+        List<GameClass> selectorOneParents = parentSelectorOne.selectParentsFromPopulation(population,
+                (int) (parentsAmountToSelect * parentSelectorPercentage));
+
+        //To avoid selecting duplicate parents using the second selection method
+        population.removeAll(selectorOneParents);
+
+        List<GameClass> selectorTwoParents = parentSelectorTwo.selectParentsFromPopulation(population,
+                (int) (parentsAmountToSelect * (1 - populationGeneratorPercentage)));
+
+        List <GameClass> parents = new ArrayList<>();
+        parents.addAll(selectorOneParents);
+        parents.addAll(selectorTwoParents);
+
+        return parents;
+    }
+
+    private static List<GameClass> selectNextGeneration(List<GameClass> parents, List<GameClass> children) {
+
+        List<GameClass> newPopulationOne = populationGeneratorOne.generateFromCurrentPopulation(parents, children,
+                (int) (populationAmountToSelect * populationGeneratorPercentage));
+
+        parents.removeAll(newPopulationOne);
+        children.removeAll(newPopulationOne);
+
+        List<GameClass> newPopulationTwo = populationGeneratorTwo.generateFromCurrentPopulation(parents, children,
+                (int) (populationAmountToSelect * (1 - populationGeneratorPercentage)));
+
+        List<GameClass> population = new ArrayList<>();
+        population.addAll(newPopulationOne);
+        population.addAll(newPopulationTwo);
+
+        return population;
     }
 
     private static List<GameClass> generateInitialPopulation() throws IOException {
