@@ -12,7 +12,7 @@ public class EliteSelector implements ParentSelector {
     private final Comparator<GameClass> performanceComparator;
 
     public EliteSelector() {
-        performanceComparator = (o1, o2) -> (int) (o1.getBestPerformance() - o2.getBestPerformance());
+        performanceComparator = (o1, o2) -> Double.compare(o2.getBestPerformance(), o1.getBestPerformance());
     }
 
     @Override
