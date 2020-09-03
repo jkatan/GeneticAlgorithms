@@ -1,5 +1,6 @@
 import GeneticComponents.Implementations.ParentSelectors.EliteSelector;
 import GeneticComponents.Implementations.ConditionCheckers.TimeConditionChecker;
+import GeneticComponents.Implementations.Reproductors.CrossoverManager;
 import GeneticComponents.Implementations.Reproductors.OnePointCrossover;
 import GeneticComponents.Interfaces.*;
 import Utils.Utils;
@@ -16,7 +17,8 @@ public class FindBestCombination {
 
     private static Mutator mutator; // TODO: implement mutators
 
-    private static Reproductor reproductor; // TODO: implement reproductors
+    // TODO: implement reproductors
+    private static CrossoverManager crossoverManager;
 
     // TODO: implement the rest of the selectors
     private static ParentSelector parentSelectorOne;
@@ -64,7 +66,7 @@ public class FindBestCombination {
         parentSelectorPercentage = 0.5;
         parentsAmountToSelect = 6;
 
-        reproductor = new OnePointCrossover();
+        crossoverManager = new CrossoverManager(new OnePointCrossover());
 
         findBestCombination();
     }
@@ -76,32 +78,10 @@ public class FindBestCombination {
         conditionChecker.initialize();
         while (!conditionChecker.isConditionMet()) {
             parents = selectParents(population);
-            children = cross(parents);
+            children = crossoverManager.cross(parents);
             mutator.mutate(children);
             population = selectNextGeneration(parents, children);
         }
-    }
-
-    private static List<GameClass> cross(List<GameClass> parents) {
-        List<GameClass> parentsCopy = new ArrayList<>(parents);
-        List<GameClass> children = new ArrayList<>();
-
-        while (!parentsCopy.isEmpty()) {
-            GameClass parent1 = pickRandomParent(parentsCopy);
-            parentsCopy.remove(parent1);
-
-            GameClass parent2 = pickRandomParent(parentsCopy);
-            parentsCopy.remove(parent2);
-
-            children.addAll(reproductor.cross(parent1, parent2));
-        }
-
-        return children;
-    }
-
-    private static GameClass pickRandomParent(List<GameClass> parents) {
-        int randomIndex = (int) Math.ceil(Utils.getRandomInRange(0.0, parents.size() - 1));
-        return parents.get(randomIndex);
     }
 
     private static List<GameClass> selectParents(List<GameClass> population) {
