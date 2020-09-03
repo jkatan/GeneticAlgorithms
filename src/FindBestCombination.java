@@ -1,6 +1,8 @@
 import GeneticComponents.Implementations.ParentSelectors.EliteSelector;
 import GeneticComponents.Implementations.ConditionCheckers.TimeConditionChecker;
+import GeneticComponents.Implementations.Reproductors.OnePointCrossover;
 import GeneticComponents.Interfaces.*;
+import Utils.Utils;
 import classes.*;
 import equipment.Equipment;
 
@@ -48,11 +50,11 @@ public class FindBestCombination {
         initialPopulationSize = 10;
 
         // This is just for testing, TODO: configuration file
-        armasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/armas.tsv");
-        botasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/botas.tsv");
-        cascosFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/cascos.tsv");
-        guantesFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/guantes.tsv");
-        pecherasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/pecheras.tsv");
+        armasFile = new File("");
+        botasFile = new File("");
+        cascosFile = new File("");
+        guantesFile = new File("");
+        pecherasFile = new File("");
         classSelection = "warrior";
 
         conditionChecker = new TimeConditionChecker(60.0);
@@ -62,21 +64,9 @@ public class FindBestCombination {
         parentSelectorPercentage = 0.5;
         parentsAmountToSelect = 6;
 
-        List<GameClass> population = generateInitialPopulation();
-        int individualCount = 1;
-        for (GameClass individual : population) {
-            System.out.println("Individual number " + individualCount);
-            System.out.println(individual);
-            System.out.println("Individual performance: " + individual.getBestPerformance());
-            System.out.println();
-        }
+        reproductor = new OnePointCrossover();
 
-        List<GameClass> parents = selectParents(population);
-        for (GameClass individual : parents) {
-            System.out.println(individual);
-        }
-
-        //findBestCombination();
+        findBestCombination();
     }
 
     private static void findBestCombination() throws IOException {
@@ -86,10 +76,32 @@ public class FindBestCombination {
         conditionChecker.initialize();
         while (!conditionChecker.isConditionMet()) {
             parents = selectParents(population);
-            children = reproductor.cross(parents);
+            children = cross(parents);
             mutator.mutate(children);
             population = selectNextGeneration(parents, children);
         }
+    }
+
+    private static List<GameClass> cross(List<GameClass> parents) {
+        List<GameClass> parentsCopy = new ArrayList<>(parents);
+        List<GameClass> children = new ArrayList<>();
+
+        while (!parentsCopy.isEmpty()) {
+            GameClass parent1 = pickRandomParent(parentsCopy);
+            parentsCopy.remove(parent1);
+
+            GameClass parent2 = pickRandomParent(parentsCopy);
+            parentsCopy.remove(parent2);
+
+            children.addAll(reproductor.cross(parent1, parent2));
+        }
+
+        return children;
+    }
+
+    private static GameClass pickRandomParent(List<GameClass> parents) {
+        int randomIndex = (int) Math.ceil(Utils.getRandomInRange(0.0, parents.size() - 1));
+        return parents.get(randomIndex);
     }
 
     private static List<GameClass> selectParents(List<GameClass> population) {
@@ -161,7 +173,7 @@ public class FindBestCombination {
     }
 
     private static double generateRandomHeight() {
-        return getRandomNumber(1.3, 2.0);
+        return Utils.getRandomInRange(1.3, 2.0);
     }
 
     private static List<Equipment> generateRandomEquipment() throws IOException {
@@ -179,7 +191,7 @@ public class FindBestCombination {
         br.readLine(); // Consumes first line that contains the header
         String line;
         String[] itemAttributes;
-        int randomItemId = (int) getRandomNumber(0, 999999);
+        int randomItemId = (int) Math.ceil(Utils.getRandomInRange(0, 999999));
         while ((line = br.readLine()) != null) {
             itemAttributes = line.split("\t");
             if (Integer.parseInt(itemAttributes[0]) == randomItemId) {
@@ -194,9 +206,5 @@ public class FindBestCombination {
         }
         br.close();
         return null;
-    }
-
-    private static double getRandomNumber(double min, double max) {
-        return (Math.random() * (max - min)) + min;
     }
 }

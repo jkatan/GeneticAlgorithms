@@ -29,6 +29,14 @@ public abstract class GameClass {
         return equipment;
     }
 
+    public void setHeight(double height) {
+        this.height = height;
+    }
+
+    public double getHeight() {
+        return this.height;
+    }
+
     public void setAttack(double strength, double agility, double expertise) {
         this.attack = (agility + expertise) * strength * attackModifier;
     }
