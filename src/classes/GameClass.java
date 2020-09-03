@@ -60,5 +60,17 @@ public abstract class GameClass {
         setDefense(health, resistance, expertise);
     }
 
+    @Override
+    public String toString() {
+        return "GameClass{" +
+                "height=" + height +
+                ", equipment=" + equipment +
+                ", attack=" + attack +
+                ", attackModifier=" + attackModifier +
+                ", defense=" + defense +
+                ", defenseModifier=" + defenseModifier +
+                '}';
+    }
+
     public abstract double getBestPerformance();
 }

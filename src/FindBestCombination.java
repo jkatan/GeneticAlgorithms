@@ -44,23 +44,39 @@ public class FindBestCombination {
     private static String classSelection;
 
     public static void main(String[] args) throws IOException {
-        initialPopulationSize = 200;
 
-        armasFile = new File(args[1]);
-        botasFile = new File(args[2]);
-        cascosFile = new File(args[3]);
-        guantesFile = new File(args[4]);
-        pecherasFile = new File(args[5]);
-        classSelection = args[6];
+        initialPopulationSize = 10;
+
+        // This is just for testing, TODO: configuration file
+        armasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/armas.tsv");
+        botasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/botas.tsv");
+        cascosFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/cascos.tsv");
+        guantesFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/guantes.tsv");
+        pecherasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/pecheras.tsv");
+        classSelection = "warrior";
 
         conditionChecker = new TimeConditionChecker(60.0);
 
         parentSelectorOne = new EliteSelector();
         parentSelectorTwo = new EliteSelector();
         parentSelectorPercentage = 0.5;
-        parentsAmountToSelect = 100;
+        parentsAmountToSelect = 6;
 
-        findBestCombination();
+        List<GameClass> population = generateInitialPopulation();
+        int individualCount = 1;
+        for (GameClass individual : population) {
+            System.out.println("Individual number " + individualCount);
+            System.out.println(individual);
+            System.out.println("Individual performance: " + individual.getBestPerformance());
+            System.out.println();
+        }
+
+        List<GameClass> parents = selectParents(population);
+        for (GameClass individual : parents) {
+            System.out.println(individual);
+        }
+
+        //findBestCombination();
     }
 
     private static void findBestCombination() throws IOException {
@@ -78,14 +94,14 @@ public class FindBestCombination {
 
     private static List<GameClass> selectParents(List<GameClass> population) {
 
-        List<GameClass> selectorOneParents = parentSelectorOne.selectParentsFromPopulation(population,
-                (int) (parentsAmountToSelect * parentSelectorPercentage));
+        int parentsMethodOne = (int)((double)parentsAmountToSelect * parentSelectorPercentage);
+        List<GameClass> selectorOneParents = parentSelectorOne.selectParentsFromPopulation(population, parentsMethodOne);
 
         //To avoid selecting duplicate parents using the second selection method
         population.removeAll(selectorOneParents);
 
-        List<GameClass> selectorTwoParents = parentSelectorTwo.selectParentsFromPopulation(population,
-                (int) (parentsAmountToSelect * (1 - populationGeneratorPercentage)));
+        int parentsMethodTwo = (int)((double)parentsAmountToSelect * (1.0 - parentSelectorPercentage));
+        List<GameClass> selectorTwoParents = parentSelectorTwo.selectParentsFromPopulation(population, parentsMethodTwo);
 
         List <GameClass> parents = new ArrayList<>();
         parents.addAll(selectorOneParents);
@@ -97,13 +113,13 @@ public class FindBestCombination {
     private static List<GameClass> selectNextGeneration(List<GameClass> parents, List<GameClass> children) {
 
         List<GameClass> newPopulationOne = populationGeneratorOne.generateFromCurrentPopulation(parents, children,
-                (int) (populationAmountToSelect * populationGeneratorPercentage));
+                (int) ((double)populationAmountToSelect * populationGeneratorPercentage));
 
         parents.removeAll(newPopulationOne);
         children.removeAll(newPopulationOne);
 
         List<GameClass> newPopulationTwo = populationGeneratorTwo.generateFromCurrentPopulation(parents, children,
-                (int) (populationAmountToSelect * (1 - populationGeneratorPercentage)));
+                (int) ((double)populationAmountToSelect * (1.0 - populationGeneratorPercentage)));
 
         List<GameClass> population = new ArrayList<>();
         population.addAll(newPopulationOne);
@@ -115,6 +131,7 @@ public class FindBestCombination {
     private static List<GameClass> generateInitialPopulation() throws IOException {
         List<GameClass> initialRandomPopulation = new ArrayList<>();
         for (int i = 0; i < initialPopulationSize; i++) {
+            System.out.println("Generating individual " + i);
             double randomHeight = generateRandomHeight();
             List<Equipment> randomEquipment = generateRandomEquipment();
             GameClass randomIndividual = createCharacterClassSelection(randomHeight, randomEquipment);
@@ -171,9 +188,11 @@ public class FindBestCombination {
                 double expertise = Double.parseDouble(itemAttributes[3]);
                 double resistance = Double.parseDouble(itemAttributes[4]);
                 double health = Double.parseDouble(itemAttributes[5]);
+                br.close();
                 return new Equipment(strength, agility, expertise, resistance, health);
             }
         }
+        br.close();
         return null;
     }
 
