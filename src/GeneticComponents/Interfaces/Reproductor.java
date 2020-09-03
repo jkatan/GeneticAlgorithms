@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface Reproductor {
 
-    List<GameClass> cross(List<GameClass> parents);
+    List<GameClass> cross(GameClass parent1, GameClass parent2);
 }
