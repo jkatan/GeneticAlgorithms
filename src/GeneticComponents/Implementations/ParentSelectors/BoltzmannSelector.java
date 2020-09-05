@@ -41,7 +41,7 @@ public class BoltzmannSelector implements ParentSelector {
     }
 
     private double getTemperature() {
-        return t_c + (t_0 - t_c)*Math.exp(-k* FindBestCombination.getCurrentGeneration());
+        return t_c + (t_0 - t_c)*Math.exp(-k * FindBestCombination.getCurrentGeneration());
     }
 
     private double getBoltzmannAverage(List<GameClass> population) {

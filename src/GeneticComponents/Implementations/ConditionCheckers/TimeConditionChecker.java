@@ -17,7 +17,12 @@ public class TimeConditionChecker implements ConditionChecker {
     }
 
     @Override
-    public Boolean isConditionMet() {
+    public void update(Double newValue) {
+        // N/A with time
+    }
+
+    @Override
+    public boolean isConditionMet() {
         return (System.currentTimeMillis() - startTime) / 1000 >= timeLimit;
     }
 }

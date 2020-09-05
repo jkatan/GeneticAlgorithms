@@ -4,6 +4,10 @@ import GeneticComponents.Implementations.Mutators.*;
 import GeneticComponents.Implementations.ParentSelectors.*;
 import GeneticComponents.Implementations.ConditionCheckers.TimeConditionChecker;
 import GeneticComponents.Implementations.Reproductors.*;
+import GeneticComponents.Implementations.ConditionCheckers.*;
+import GeneticComponents.Implementations.ParentSelectors.EliteSelector;
+import GeneticComponents.Implementations.Reproductors.CrossoverManager;
+import GeneticComponents.Implementations.Reproductors.OnePointCrossover;
 import GeneticComponents.Interfaces.*;
 import Utils.Utils;
 import classes.*;
@@ -13,6 +17,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class FindBestCombination {
 
@@ -52,18 +57,23 @@ public class FindBestCombination {
     // Lo que esta en este main son solo cosas que estuve testeando y que luego se reemplazara
     // por la lectura del archivo de configuracion, asi que puedes ignorar esta parte.
     public static void main(String[] args) throws IOException {
+        String geneticAlgConfigPath = "src/config.properties";
+        final Properties properties = new Properties();
+        properties.load(new FileInputStream(geneticAlgConfigPath));
 
-        initialPopulationSize = 20;
+
         double geneMutationProbability = 0.8;
 
-        armasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/armas.tsv");
-        botasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/botas.tsv");
-        cascosFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/cascos.tsv");
-        guantesFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/guantes.tsv");
-        pecherasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/pecheras.tsv");
-        classSelection = "warrior";
+        initialPopulationSize = Integer.parseInt(properties.getProperty("initialPopSize"));
 
-        conditionChecker = new TimeConditionChecker(60.0);
+        armasFile = new File("src/equipment/tsvs" + properties.getProperty("equipmentWeapons"));
+        botasFile = new File("src/equipment/tsvs" + properties.getProperty("equipmentBoots"));
+        cascosFile = new File("src/equipment/tsvs" + properties.getProperty("equipmentHelms"));
+        guantesFile = new File("src/equipment/tsvs" + properties.getProperty("equipmentGloves"));
+        pecherasFile = new File("src/equipment/tsvs" + properties.getProperty("equipmentCuirass"));
+
+        classSelection = properties.getProperty("class");
+        String significant = properties.getProperty("significant");
 
         parentSelectorOne = new BoltzmannSelector(12.3, 5.78, 1.5);
         currentGeneration = 0;
@@ -90,6 +100,81 @@ public class FindBestCombination {
             e.printStackTrace();
         }
 
+        String value = properties.getProperty("value");
+        switch (properties.getProperty("cutoff")) {
+            case "time":
+                conditionChecker = new TimeConditionChecker(Double.parseDouble(value));
+                break;
+            case "gens":
+                conditionChecker = new GenerationConditionChecker(Integer.parseInt(value));
+                break;
+            case "asol":
+                conditionChecker = new AcceptableSolutionConditionChecker(Double.parseDouble(value));
+                break;
+            case "structure":
+                conditionChecker = new StructureConditionChecker(
+                        Integer.parseInt(value), Double.parseDouble(properties.getProperty("significant")));
+                break;
+            case "content":
+                conditionChecker = new ContentConditionChecker(Integer.parseInt(value));
+                break;
+            default:
+                throw new IllegalArgumentException("No condition checker provided, iterations would never stop!");
+        }
+
+        String selectorOne = properties.getProperty("selectorOne");
+        String selectorTwo = properties.getProperty("selectorTwo");
+        parentSelectorPercentage = Double.parseDouble(properties.getProperty("parentSelectorPercentage"));
+        parentsAmountToSelect = Integer.parseInt(properties.getProperty("parentsAmountToSelect"));
+        switch (selectorOne) {
+            case "elite":
+                parentSelectorOne = new EliteSelector();
+                break;
+            case "roulette":
+                break;
+            case "universal":
+                break;
+            case "boltzmann":
+                break;
+            case "dett":
+                break;
+            case "probt":
+                break;
+            default:
+                throw new IllegalArgumentException("No parent selector chosen for selector 1!");
+        }
+        switch (selectorTwo) {
+            case "elite":
+                parentSelectorTwo = new EliteSelector();
+                break;
+            case "roulette":
+                break;
+            case "universal":
+                break;
+            case "boltzmann":
+                break;
+            case "dett":
+                break;
+            case "probt":
+                break;
+            default:
+                throw new IllegalArgumentException("No parent selector chosen for selector 2!");
+        }
+
+        switch (properties.getProperty("cross")) {
+            case "pcross":
+                crossoverManager = new CrossoverManager(new OnePointCrossover());
+                break;
+            case "2pcross":
+                break;
+            case "across":
+                break;
+            case "unicross":
+                break;
+            default:
+                throw new IllegalArgumentException("No crossover chosen!");
+        }
+
         //findBestCombination();
     }
 
@@ -108,7 +193,11 @@ public class FindBestCombination {
             children = crossoverManager.cross(parents);
             mutatorManager.mutate(children);
             population = selectNextGeneration(parents, children);
+
+
+            // do I need to do this here? or in update?
             currentGeneration++;
+            // todo: add call to conditionChecker.update(something)
         }
     }
 
