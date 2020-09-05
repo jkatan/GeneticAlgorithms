@@ -1,6 +1,7 @@
 import GeneticComponents.Implementations.Mutators.*;
 import GeneticComponents.Implementations.ParentSelectors.EliteSelector;
 import GeneticComponents.Implementations.ConditionCheckers.TimeConditionChecker;
+import GeneticComponents.Implementations.ParentSelectors.RankingSelector;
 import GeneticComponents.Implementations.ParentSelectors.RouletteWheelSelector;
 import GeneticComponents.Implementations.ParentSelectors.UniversalSelector;
 import GeneticComponents.Implementations.Reproductors.*;
@@ -63,7 +64,7 @@ public class FindBestCombination {
 
         conditionChecker = new TimeConditionChecker(60.0);
 
-        parentSelectorOne = new UniversalSelector();
+        parentSelectorOne = new RankingSelector();
         parentSelectorTwo = new EliteSelector();
         parentSelectorPercentage = 0.5;
         parentsAmountToSelect = 6;
