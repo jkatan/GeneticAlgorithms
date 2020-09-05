@@ -2,6 +2,7 @@ import GeneticComponents.Implementations.Mutators.*;
 import GeneticComponents.Implementations.ParentSelectors.EliteSelector;
 import GeneticComponents.Implementations.ConditionCheckers.TimeConditionChecker;
 import GeneticComponents.Implementations.ParentSelectors.RouletteWheelSelector;
+import GeneticComponents.Implementations.ParentSelectors.UniversalSelector;
 import GeneticComponents.Implementations.Reproductors.*;
 import GeneticComponents.Interfaces.*;
 import Utils.Utils;
@@ -17,8 +18,7 @@ public class FindBestCombination {
 
     private static ConditionChecker conditionChecker;
 
-    private static MutatorManager mutatorManager; // TODO: implement mutators
-
+    private static MutatorManager mutatorManager;
     private static CrossoverManager crossoverManager;
 
     // TODO: implement the rest of the selectors
@@ -63,7 +63,7 @@ public class FindBestCombination {
 
         conditionChecker = new TimeConditionChecker(60.0);
 
-        parentSelectorOne = new RouletteWheelSelector();
+        parentSelectorOne = new UniversalSelector();
         parentSelectorTwo = new EliteSelector();
         parentSelectorPercentage = 0.5;
         parentsAmountToSelect = 6;
@@ -73,10 +73,12 @@ public class FindBestCombination {
                 guantesFile, pecherasFile);
         try {
             List<GameClass> firstGeneration = generateInitialPopulation();
+            System.out.println("First generation individuals: ");
             for (GameClass individual : firstGeneration) {
                 System.out.println(individual);
             }
             List<GameClass> parents = parentSelectorOne.selectParentsFromPopulation(firstGeneration, 3);
+            System.out.println("Selected parents: ");
             for (GameClass parent : parents) {
                 System.out.println(parent);
             }
