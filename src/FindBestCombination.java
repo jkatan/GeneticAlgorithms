@@ -61,7 +61,7 @@ public class FindBestCombination {
 
         conditionChecker = new TimeConditionChecker(60.0);
 
-        parentSelectorOne = new DeterministicTournamentSelector(3);
+        parentSelectorOne = new ProbabilisticTournamentSelector();
         parentSelectorTwo = new EliteSelector();
         parentSelectorPercentage = 0.5;
         parentsAmountToSelect = 6;
@@ -75,7 +75,7 @@ public class FindBestCombination {
             for (GameClass individual : firstGeneration) {
                 System.out.println(individual);
             }
-            List<GameClass> parents = parentSelectorOne.selectParentsFromPopulation(firstGeneration, 5);
+            List<GameClass> parents = parentSelectorOne.selectParentsFromPopulation(firstGeneration, 3);
             System.out.println("Selected parents: ");
             for (GameClass parent : parents) {
                 System.out.println(parent);
