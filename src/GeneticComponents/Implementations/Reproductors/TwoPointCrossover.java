@@ -5,7 +5,6 @@ import Utils.Utils;
 import classes.GameClass;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TwoPointCrossover implements Reproductor {
@@ -20,11 +19,8 @@ public class TwoPointCrossover implements Reproductor {
         int randomLocusOne = (int) Math.ceil(Utils.getRandomInRange(0, genesQuantity));
         int randomLocusTwo = (int) Math.ceil(Utils.getRandomInRange(0, genesQuantity));
 
-        System.out.println("Random locus 1: " + randomLocusOne);
-        System.out.println("Random locus 2: " + randomLocusTwo);
-
-        int startingLocus = 0;
-        int finishLocus = 0;
+        int startingLocus;
+        int finishLocus;
         if (randomLocusOne < randomLocusTwo) {
             startingLocus = randomLocusOne;
             finishLocus = randomLocusTwo;

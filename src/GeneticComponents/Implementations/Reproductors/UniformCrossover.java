@@ -20,19 +20,16 @@ public class UniformCrossover implements Reproductor {
         int locusAmount = parent1.getEquipment().size();
         GameClass child1 = children.get(0);
         GameClass child2 = children.get(1);
-        double randomNumber = 0.0;
+        double randomNumber;
         for (int i=0; i<=locusAmount; i++) {
             randomNumber = Utils.getRandomInRange(0.0, 1.0);
             if (randomNumber < geneExchangeProbability) {
-                System.out.println("Genes exchanged in locus " + i);
                 CrossoverManager.exchangeGenes(parent1, child1, parent2, child2, i);
             }
         }
 
         child1.setAttributes();
         child2.setAttributes();
-
-        CrossoverManager.printParentsAndChildrenInformation(parent1, child1, parent2, child2);
 
         return children;
     }

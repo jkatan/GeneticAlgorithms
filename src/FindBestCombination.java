@@ -1,9 +1,6 @@
 import GeneticComponents.Implementations.ParentSelectors.EliteSelector;
 import GeneticComponents.Implementations.ConditionCheckers.TimeConditionChecker;
-import GeneticComponents.Implementations.Reproductors.CrossoverManager;
-import GeneticComponents.Implementations.Reproductors.OnePointCrossover;
-import GeneticComponents.Implementations.Reproductors.TwoPointCrossover;
-import GeneticComponents.Implementations.Reproductors.UniformCrossover;
+import GeneticComponents.Implementations.Reproductors.*;
 import GeneticComponents.Interfaces.*;
 import Utils.Utils;
 import classes.*;
@@ -69,7 +66,7 @@ public class FindBestCombination {
         parentSelectorPercentage = 0.5;
         parentsAmountToSelect = 6;
 
-        crossoverManager = new CrossoverManager(new UniformCrossover());
+        crossoverManager = new CrossoverManager(new AnnularCrossover());
         try {
             List<GameClass> parents = generateInitialPopulation();
             List<GameClass> children = crossoverManager.cross(parents);

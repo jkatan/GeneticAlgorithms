@@ -5,7 +5,6 @@ import Utils.Utils;
 import classes.GameClass;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class OnePointCrossover implements Reproductor {
@@ -18,8 +17,6 @@ public class OnePointCrossover implements Reproductor {
 
         int genesQuantity = parent1.getEquipment().size();
         int randomLocus = (int) Math.ceil(Utils.getRandomInRange(0, genesQuantity));
-
-        System.out.println("Random locus: " + randomLocus);
 
         GameClass child1 = children.get(0);
         GameClass child2 = children.get(1);
