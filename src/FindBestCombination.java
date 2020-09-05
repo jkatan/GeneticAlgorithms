@@ -1,9 +1,6 @@
 import GeneticComponents.Implementations.Mutators.*;
-import GeneticComponents.Implementations.ParentSelectors.EliteSelector;
+import GeneticComponents.Implementations.ParentSelectors.*;
 import GeneticComponents.Implementations.ConditionCheckers.TimeConditionChecker;
-import GeneticComponents.Implementations.ParentSelectors.RankingSelector;
-import GeneticComponents.Implementations.ParentSelectors.RouletteWheelSelector;
-import GeneticComponents.Implementations.ParentSelectors.UniversalSelector;
 import GeneticComponents.Implementations.Reproductors.*;
 import GeneticComponents.Interfaces.*;
 import Utils.Utils;
@@ -51,7 +48,7 @@ public class FindBestCombination {
 
     public static void main(String[] args) throws IOException {
 
-        initialPopulationSize = 5;
+        initialPopulationSize = 8;
         double geneMutationProbability = 0.8;
 
         // This is just for testing, TODO: configuration file
@@ -64,12 +61,12 @@ public class FindBestCombination {
 
         conditionChecker = new TimeConditionChecker(60.0);
 
-        parentSelectorOne = new RankingSelector();
+        parentSelectorOne = new DeterministicTournamentSelector(3);
         parentSelectorTwo = new EliteSelector();
         parentSelectorPercentage = 0.5;
         parentsAmountToSelect = 6;
 
-        //crossoverManager = new CrossoverManager(new AnnularCrossover());
+        crossoverManager = new CrossoverManager(new AnnularCrossover());
         mutatorManager = new MutatorManager(new CompleteMutator(geneMutationProbability), armasFile, botasFile, cascosFile,
                 guantesFile, pecherasFile);
         try {
@@ -78,7 +75,7 @@ public class FindBestCombination {
             for (GameClass individual : firstGeneration) {
                 System.out.println(individual);
             }
-            List<GameClass> parents = parentSelectorOne.selectParentsFromPopulation(firstGeneration, 3);
+            List<GameClass> parents = parentSelectorOne.selectParentsFromPopulation(firstGeneration, 5);
             System.out.println("Selected parents: ");
             for (GameClass parent : parents) {
                 System.out.println(parent);

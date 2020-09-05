@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class RankingSelector implements ParentSelector {
+
     @Override
     public List<GameClass> selectParentsFromPopulation(List<GameClass> population, int parentsAmount) {
         List<GameClass> rankedPopulation = new ArrayList<>(population);
