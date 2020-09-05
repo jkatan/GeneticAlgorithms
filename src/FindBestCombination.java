@@ -2,12 +2,15 @@ import GeneticComponents.Implementations.ParentSelectors.EliteSelector;
 import GeneticComponents.Implementations.ConditionCheckers.TimeConditionChecker;
 import GeneticComponents.Implementations.Reproductors.CrossoverManager;
 import GeneticComponents.Implementations.Reproductors.OnePointCrossover;
+import GeneticComponents.Implementations.Reproductors.TwoPointCrossover;
+import GeneticComponents.Implementations.Reproductors.UniformCrossover;
 import GeneticComponents.Interfaces.*;
 import Utils.Utils;
 import classes.*;
 import equipment.Equipment;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,14 +52,14 @@ public class FindBestCombination {
 
     public static void main(String[] args) throws IOException {
 
-        initialPopulationSize = 10;
+        initialPopulationSize = 2;
 
         // This is just for testing, TODO: configuration file
-        armasFile = new File("");
-        botasFile = new File("");
-        cascosFile = new File("");
-        guantesFile = new File("");
-        pecherasFile = new File("");
+        armasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/armas.tsv");
+        botasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/botas.tsv");
+        cascosFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/cascos.tsv");
+        guantesFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/guantes.tsv");
+        pecherasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/pecheras.tsv");
         classSelection = "warrior";
 
         conditionChecker = new TimeConditionChecker(60.0);
@@ -66,12 +69,24 @@ public class FindBestCombination {
         parentSelectorPercentage = 0.5;
         parentsAmountToSelect = 6;
 
-        crossoverManager = new CrossoverManager(new OnePointCrossover());
-
-        findBestCombination();
+        crossoverManager = new CrossoverManager(new UniformCrossover());
+        try {
+            List<GameClass> parents = generateInitialPopulation();
+            List<GameClass> children = crossoverManager.cross(parents);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+        /*try {
+            findBestCombination();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }*/
     }
 
-    private static void findBestCombination() throws IOException {
+    private static void findBestCombination() throws IOException, InvocationTargetException, NoSuchMethodException,
+            InstantiationException, IllegalAccessException {
         List<GameClass> parents;
         List<GameClass> children;
         List<GameClass> population = generateInitialPopulation();
@@ -175,13 +190,14 @@ public class FindBestCombination {
         while ((line = br.readLine()) != null) {
             itemAttributes = line.split("\t");
             if (Integer.parseInt(itemAttributes[0]) == randomItemId) {
+                int id = Integer.parseInt(itemAttributes[0]);
                 double strength = Double.parseDouble(itemAttributes[1]);
                 double agility = Double.parseDouble(itemAttributes[2]);
                 double expertise = Double.parseDouble(itemAttributes[3]);
                 double resistance = Double.parseDouble(itemAttributes[4]);
                 double health = Double.parseDouble(itemAttributes[5]);
                 br.close();
-                return new Equipment(strength, agility, expertise, resistance, health);
+                return new Equipment(strength, agility, expertise, resistance, health, id);
             }
         }
         br.close();
