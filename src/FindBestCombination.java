@@ -1,6 +1,7 @@
 import GeneticComponents.Implementations.Mutators.*;
 import GeneticComponents.Implementations.ParentSelectors.EliteSelector;
 import GeneticComponents.Implementations.ConditionCheckers.TimeConditionChecker;
+import GeneticComponents.Implementations.ParentSelectors.RouletteWheelSelector;
 import GeneticComponents.Implementations.Reproductors.*;
 import GeneticComponents.Interfaces.*;
 import Utils.Utils;
@@ -49,7 +50,7 @@ public class FindBestCombination {
 
     public static void main(String[] args) throws IOException {
 
-        initialPopulationSize = 2;
+        initialPopulationSize = 5;
         double geneMutationProbability = 0.8;
 
         // This is just for testing, TODO: configuration file
@@ -62,7 +63,7 @@ public class FindBestCombination {
 
         conditionChecker = new TimeConditionChecker(60.0);
 
-        parentSelectorOne = new EliteSelector();
+        parentSelectorOne = new RouletteWheelSelector();
         parentSelectorTwo = new EliteSelector();
         parentSelectorPercentage = 0.5;
         parentsAmountToSelect = 6;
@@ -71,13 +72,11 @@ public class FindBestCombination {
         mutatorManager = new MutatorManager(new CompleteMutator(geneMutationProbability), armasFile, botasFile, cascosFile,
                 guantesFile, pecherasFile);
         try {
-            List<GameClass> parents = generateInitialPopulation();
-            System.out.println("before mutation: ");
-            for (GameClass parent : parents) {
-                System.out.println(parent);
+            List<GameClass> firstGeneration = generateInitialPopulation();
+            for (GameClass individual : firstGeneration) {
+                System.out.println(individual);
             }
-            mutatorManager.mutate(parents);
-            System.out.println("after mutation: ");
+            List<GameClass> parents = parentSelectorOne.selectParentsFromPopulation(firstGeneration, 3);
             for (GameClass parent : parents) {
                 System.out.println(parent);
             }
