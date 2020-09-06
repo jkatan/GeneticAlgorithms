@@ -8,8 +8,8 @@ import java.util.List;
 
 public class ParentSelectorManager {
 
-    public static List<GameClass> roulletteWheelSelect(List<GameClass> population, int parentsAmount,
-          List<Double> accumulatedRelativeFitnesses, List<Double> randomNumbers) {
+    public static List<GameClass> rouletteWheelSelect(List<GameClass> population, int parentsAmount,
+              List<Double> accumulatedRelativeFitnesses, List<Double> randomNumbers) {
 
         List<GameClass> parentsSelection = new ArrayList<>(parentsAmount);
 

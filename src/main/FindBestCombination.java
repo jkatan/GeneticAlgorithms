@@ -1,3 +1,5 @@
+package main;
+
 import GeneticComponents.Implementations.Mutators.*;
 import GeneticComponents.Implementations.ParentSelectors.*;
 import GeneticComponents.Implementations.ConditionCheckers.TimeConditionChecker;
@@ -19,7 +21,6 @@ public class FindBestCombination {
     private static MutatorManager mutatorManager;
     private static CrossoverManager crossoverManager;
 
-    // TODO: implement the rest of the selectors
     private static ParentSelector parentSelectorOne;
     private static ParentSelector parentSelectorTwo;
     private static double parentSelectorPercentage;
@@ -46,12 +47,15 @@ public class FindBestCombination {
 
     private static String classSelection;
 
+    private static int currentGeneration;
+
+    // Lo que esta en este main son solo cosas que estuve testeando y que luego se reemplazara
+    // por la lectura del archivo de configuracion, asi que puedes ignorar esta parte.
     public static void main(String[] args) throws IOException {
 
-        initialPopulationSize = 8;
+        initialPopulationSize = 20;
         double geneMutationProbability = 0.8;
 
-        // This is just for testing, TODO: configuration file
         armasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/armas.tsv");
         botasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/botas.tsv");
         cascosFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/cascos.tsv");
@@ -61,7 +65,8 @@ public class FindBestCombination {
 
         conditionChecker = new TimeConditionChecker(60.0);
 
-        parentSelectorOne = new ProbabilisticTournamentSelector();
+        parentSelectorOne = new BoltzmannSelector(12.3, 5.78, 1.5);
+        currentGeneration = 0;
         parentSelectorTwo = new EliteSelector();
         parentSelectorPercentage = 0.5;
         parentsAmountToSelect = 6;
@@ -75,7 +80,7 @@ public class FindBestCombination {
             for (GameClass individual : firstGeneration) {
                 System.out.println(individual);
             }
-            List<GameClass> parents = parentSelectorOne.selectParentsFromPopulation(firstGeneration, 3);
+            List<GameClass> parents = parentSelectorOne.selectParentsFromPopulation(firstGeneration, 7);
             System.out.println("Selected parents: ");
             for (GameClass parent : parents) {
                 System.out.println(parent);
@@ -84,12 +89,12 @@ public class FindBestCombination {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
-        /*try {
-            findBestCombination();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-        }*/
+
+        //findBestCombination();
+    }
+
+    public static int getCurrentGeneration() {
+        return currentGeneration;
     }
 
     private static void findBestCombination() throws IOException, InvocationTargetException, NoSuchMethodException,
@@ -103,6 +108,7 @@ public class FindBestCombination {
             children = crossoverManager.cross(parents);
             mutatorManager.mutate(children);
             population = selectNextGeneration(parents, children);
+            currentGeneration++;
         }
     }
 

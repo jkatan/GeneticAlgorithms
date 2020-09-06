@@ -9,6 +9,7 @@ import java.util.List;
 
 public class DeterministicTournamentSelector implements ParentSelector {
 
+    // Should be passed in the configuration file
     private final int ammountOfTournamentParticipants;
 
     public DeterministicTournamentSelector(int ammountOfTournamentParticipants) {

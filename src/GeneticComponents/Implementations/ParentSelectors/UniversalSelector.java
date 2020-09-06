@@ -13,7 +13,7 @@ public class UniversalSelector implements ParentSelector {
     public List<GameClass> selectParentsFromPopulation(List<GameClass> population, int parentsAmount) {
         List<Double> accumulatedRelativeFitnesses = ParentSelectorManager.calculateAccumulatedRelativeFitnessesFromPopulation(population);
         List<Double> randomNumbers = generateRandomNumbers(parentsAmount);
-        return ParentSelectorManager.roulletteWheelSelect(population, parentsAmount,
+        return ParentSelectorManager.rouletteWheelSelect(population, parentsAmount,
                 accumulatedRelativeFitnesses, randomNumbers);
     }
 

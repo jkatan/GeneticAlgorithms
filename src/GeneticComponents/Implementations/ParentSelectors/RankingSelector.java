@@ -4,7 +4,6 @@ import GeneticComponents.Interfaces.ParentSelector;
 import classes.GameClass;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class RankingSelector implements ParentSelector {
@@ -27,7 +26,7 @@ public class RankingSelector implements ParentSelector {
         List<Double> accumulatedRelativeFitnesses = ParentSelectorManager.calculateAccumulatedRelativeFitnesses(relativeFitnesses);
         List<Double> randomNumbers = ParentSelectorManager.generateRandomNumbers(parentsAmount);
 
-        return ParentSelectorManager.roulletteWheelSelect(rankedPopulation, parentsAmount,
+        return ParentSelectorManager.rouletteWheelSelect(rankedPopulation, parentsAmount,
                 accumulatedRelativeFitnesses, randomNumbers);
     }
 }
