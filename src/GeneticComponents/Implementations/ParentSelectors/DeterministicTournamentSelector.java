@@ -10,10 +10,10 @@ import java.util.List;
 public class DeterministicTournamentSelector implements ParentSelector {
 
     // Should be passed in the configuration file
-    private final int ammountOfTournamentParticipants;
+    private final int amountOfTournamentParticipants;
 
-    public DeterministicTournamentSelector(int ammountOfTournamentParticipants) {
-        this.ammountOfTournamentParticipants = ammountOfTournamentParticipants;
+    public DeterministicTournamentSelector(int amountOfTournamentParticipants) {
+        this.amountOfTournamentParticipants = amountOfTournamentParticipants;
     }
 
     @Override
@@ -22,7 +22,7 @@ public class DeterministicTournamentSelector implements ParentSelector {
         for (int i=0; i<parentsAmount; i++) {
             List<GameClass> populationCopy = new ArrayList<>(population);
             List<GameClass> randomlyPickedIndividuals = new ArrayList<>();
-            for (int j=0; j<ammountOfTournamentParticipants; j++) {
+            for (int j = 0; j< amountOfTournamentParticipants; j++) {
                 int randomIndex = (int) Math.ceil(Utils.getRandomInRange(0.0, populationCopy.size() - 1));
                 randomlyPickedIndividuals.add(populationCopy.remove(randomIndex));
             }

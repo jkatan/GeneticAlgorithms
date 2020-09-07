@@ -5,23 +5,22 @@ import classes.GameClass;
 
 import java.util.List;
 
-public class TimeConditionChecker implements ConditionChecker {
+public class GenerationConditionChecker implements ConditionChecker {
+    private final int maxGenerations;
+    private double currentGeneration;
 
-    private final double timeLimit;
-    private double startTime;
-
-    public TimeConditionChecker(double time) {
-        this.timeLimit = time;
+    public GenerationConditionChecker(int nGenerations) {
+        this.maxGenerations = nGenerations;
     }
 
     @Override
     public void initialize() {
-        startTime = System.currentTimeMillis();
+        currentGeneration = 0;
     }
 
     @Override
     public void update(List<GameClass> population) {
-        // N/A with time
+        currentGeneration += 1;
     }
 
     @Override
@@ -31,6 +30,6 @@ public class TimeConditionChecker implements ConditionChecker {
 
     @Override
     public boolean isConditionMet() {
-        return (System.currentTimeMillis() - startTime) / 1000 >= timeLimit;
+        return currentGeneration == maxGenerations;
     }
 }
