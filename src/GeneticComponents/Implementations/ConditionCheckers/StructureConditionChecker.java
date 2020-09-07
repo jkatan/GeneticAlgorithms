@@ -31,10 +31,8 @@ public class StructureConditionChecker implements ConditionChecker {
         int repeatedIndividuals = 0;
         if (lastPopulation != null) {
             for (GameClass i: population) {
-                for (GameClass j: lastPopulation) {
-                    if (i.equals(j)) {
-                        repeatedIndividuals++;
-                    }
+                if (lastPopulation.contains(i)) {
+                    repeatedIndividuals++;
                 }
             }
             amountOfGenerationsWithoutChanges++;

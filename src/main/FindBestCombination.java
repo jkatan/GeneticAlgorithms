@@ -14,6 +14,9 @@ import GeneticComponents.Interfaces.*;
 import Utils.Utils;
 import classes.*;
 import equipment.Equipment;
+import org.knowm.xchart.QuickChart;
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.XYChart;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -32,7 +35,6 @@ public class FindBestCombination {
     private static ParentSelector parentSelectorTwo;
     private static double parentSelectorPercentage;
 
-    // TODO: implement population generators
     private static PopulationGenerator populationGeneratorOne;
     private static PopulationGenerator populationGeneratorTwo;
     private static double populationGeneratorPercentage;
@@ -52,19 +54,24 @@ public class FindBestCombination {
 
     private static int currentGeneration;
 
+    private static String graphOption;
+    private static List<Double> yGraphData;
+    private static List<Integer> xGraphData;
+
     public static void main(String[] args) throws IOException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         String geneticAlgConfigPath = "src/config.properties";
         final Properties properties = new Properties();
         properties.load(new FileInputStream(geneticAlgConfigPath));
-
+        yGraphData = new ArrayList<>();
+        xGraphData = new ArrayList<>();
 
         initialPopulationSize = Integer.parseInt(properties.getProperty("initialPopSize"));
 
-        armasFile = new File("src/equipment/tsvs/" + properties.getProperty("equipmentWeapons"));
-        botasFile = new File("src/equipment/tsvs/" + properties.getProperty("equipmentBoots"));
-        cascosFile = new File("src/equipment/tsvs/" + properties.getProperty("equipmentHelms"));
-        guantesFile = new File("src/equipment/tsvs/" + properties.getProperty("equipmentGloves"));
-        pecherasFile = new File("src/equipment/tsvs/" + properties.getProperty("equipmentCuirass"));
+        armasFile = new File(properties.getProperty("equipmentWeapons"));
+        botasFile = new File(properties.getProperty("equipmentBoots"));
+        cascosFile = new File(properties.getProperty("equipmentHelms"));
+        guantesFile = new File(properties.getProperty("equipmentGloves"));
+        pecherasFile = new File(properties.getProperty("equipmentCuirass"));
 
         classSelection = properties.getProperty("class");
 
@@ -120,6 +127,8 @@ public class FindBestCombination {
             case "probt":
                 parentSelectorOne = new ProbabilisticTournamentSelector();
                 break;
+            case "ranking":
+                parentSelectorOne = new RankingSelector();
             default:
                 throw new IllegalArgumentException("No parent selector chosen for selector 1!");
         }
@@ -146,8 +155,36 @@ public class FindBestCombination {
             case "probt":
                 parentSelectorTwo = new ProbabilisticTournamentSelector();
                 break;
+            case "ranking":
+                parentSelectorTwo = new RankingSelector();
+                break;
             default:
                 throw new IllegalArgumentException("No parent selector chosen for selector 2!");
+        }
+
+        String algImplOne = properties.getProperty("algImplOne");
+        String algImplTwo = properties.getProperty("algImplTwo");
+        populationGeneratorPercentage = Double.parseDouble(properties.getProperty("algImplPercentage"));
+        switch (algImplOne) {
+            case "fa":
+                populationGeneratorOne = new FillAllGenerator();
+                break;
+            case "fp":
+                populationGeneratorOne = new FillParentGenerator();
+                break;
+            default:
+                throw new IllegalArgumentException("No algorithm implementation 1!");
+        }
+
+        switch (algImplTwo) {
+            case "fa":
+                populationGeneratorTwo = new FillAllGenerator();
+                break;
+            case "fp":
+                populationGeneratorTwo = new FillParentGenerator();
+                break;
+            default:
+                throw new IllegalArgumentException("No algorithm implementation 2!");
         }
 
         switch (properties.getProperty("mutation")) {
@@ -192,6 +229,11 @@ public class FindBestCombination {
                 throw new IllegalArgumentException("No crossover chosen!");
         }
 
+        graphOption = properties.getProperty("graph");
+        if (!graphOption.equals("max") && !graphOption.equals("avg")) {
+            throw new IllegalArgumentException("No graph option chosen!");
+        }
+
         findBestCombination();
     }
 
@@ -205,19 +247,86 @@ public class FindBestCombination {
         List<GameClass> children;
         List<GameClass> population = generateInitialPopulation();
         conditionChecker.initialize();
+
+        xGraphData.add(currentGeneration);
+        yGraphData.add(getBestFitness(population));
+
+        double[][] initialGraphData = getGraphData();
+
+        // Create Chart
+        String chartTitle = "";
+        String charYTitle = "";
+        if (graphOption.equals("max")) {
+            chartTitle = "Max fitness per generation";
+            charYTitle = "max fitness";
+        } else if (graphOption.equals("avg")) {
+            chartTitle = "Average fitness per generation";
+            charYTitle = "average fitness";
+        }
+
+        final XYChart chart = QuickChart.getChart(chartTitle, "generation", charYTitle, "graph", initialGraphData[0], initialGraphData[1]);
+
+        // Show it
+        final SwingWrapper<XYChart> sw = new SwingWrapper<XYChart>(chart);
+        sw.displayChart();
+
         while (!conditionChecker.isConditionMet()) {
             parents = selectParents(population);
             children = crossoverManager.cross(parents);
             mutatorManager.mutate(children);
-            population = selectNextGeneration(population, children, population.size());
+            population = selectNextGeneration(population, children, initialPopulationSize);
+
             currentGeneration++;
+            xGraphData.add(currentGeneration);
 
             if (conditionChecker.requiresFitnessToUpdate()) {
                 conditionChecker.update(population);
             } else {
                 conditionChecker.update(null);
             }
+
+            if (graphOption.equals("max")) {
+                yGraphData.add(getBestFitness(population));
+            } else if (graphOption.equals("avg")) {
+                yGraphData.add(getAverageFitness(population));
+            }
+
+            final double[][] data = getGraphData();
+
+            chart.updateXYSeries("graph", data[0], data[1], null);
+            sw.repaintChart();
         }
+    }
+
+    private static double[][] getGraphData() {
+        double[] xData = new double[xGraphData.size()];
+        double[] yData = new double[yGraphData.size()];
+
+        for (int i=0; i<xData.length; i++) {
+            xData[i] = xGraphData.get(i);
+            yData[i] = yGraphData.get(i);
+        }
+
+        return new double[][] {xData, yData};
+    }
+
+    private static double getBestFitness(List<GameClass> population) {
+        double bestFitness = 0;
+        for (GameClass i: population) {
+            double individualFitness = i.getBestPerformance();
+            if (individualFitness > bestFitness) {
+                bestFitness = individualFitness;
+            }
+        }
+        return bestFitness;
+    }
+
+    private static double getAverageFitness(List<GameClass> population) {
+        double averageFitness = 0.0;
+        for (GameClass individual : population) {
+            averageFitness += individual.getBestPerformance();
+        }
+        return averageFitness/population.size();
     }
 
     private static List<GameClass> selectParents(List<GameClass> population) {

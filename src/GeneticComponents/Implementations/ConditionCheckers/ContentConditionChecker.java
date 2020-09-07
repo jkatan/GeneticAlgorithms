@@ -25,7 +25,7 @@ public class ContentConditionChecker implements ConditionChecker {
     @Override
     public void update(List<GameClass> population) {
         double thisGenFitness = getBestFitness(population);
-        if (thisGenFitness == this.fitness) {
+        if (Math.abs(thisGenFitness - this.fitness) <= 0.5 ) {
             amountOfGenerationsWithoutChanges++;
         } else {
             amountOfGenerationsWithoutChanges = 0;
