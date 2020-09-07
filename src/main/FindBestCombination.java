@@ -4,6 +4,10 @@ import GeneticComponents.Implementations.Mutators.*;
 import GeneticComponents.Implementations.ParentSelectors.*;
 import GeneticComponents.Implementations.ConditionCheckers.TimeConditionChecker;
 import GeneticComponents.Implementations.Reproductors.*;
+import GeneticComponents.Implementations.PopulationGenerators.FillAllGenerator;
+import GeneticComponents.Implementations.PopulationGenerators.FillParentGenerator;
+import GeneticComponents.Implementations.Reproductors.CrossoverManager;
+import GeneticComponents.Implementations.Reproductors.OnePointCrossover;
 import GeneticComponents.Interfaces.*;
 import Utils.Utils;
 import classes.*;
@@ -38,10 +42,6 @@ public class FindBestCombination {
 
     private static int initialPopulationSize;
 
-    // At the end of each generation, we select new individuals from the set of {Children + Parents}.
-    // This variable determines how many individuals will be selected from that set each generation
-    private static int populationAmountToSelect;
-
     // Amount of parents that will be selected to cross and generate new children each generation
     private static int parentsAmountToSelect;
 
@@ -61,6 +61,7 @@ public class FindBestCombination {
         cascosFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/cascos.tsv");
         guantesFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/guantes.tsv");
         pecherasFile = new File("C:/Users/Johnathan/Desktop/Development/facu/sia/fulldata/pecheras.tsv");
+
         classSelection = "warrior";
 
         conditionChecker = new TimeConditionChecker(60.0);
@@ -107,7 +108,7 @@ public class FindBestCombination {
             parents = selectParents(population);
             children = crossoverManager.cross(parents);
             mutatorManager.mutate(children);
-            population = selectNextGeneration(parents, children);
+            population = selectNextGeneration(population, children, population.size());
             currentGeneration++;
         }
     }
@@ -130,22 +131,22 @@ public class FindBestCombination {
         return parents;
     }
 
-    private static List<GameClass> selectNextGeneration(List<GameClass> parents, List<GameClass> children) {
+    private static List<GameClass> selectNextGeneration(List<GameClass> population, List<GameClass> children, int amount) {
 
-        List<GameClass> newPopulationOne = populationGeneratorOne.generateFromCurrentPopulation(parents, children,
-                (int) ((double)populationAmountToSelect * populationGeneratorPercentage));
+        List<GameClass> newPopulationOne = populationGeneratorOne.generateFromCurrentPopulation(population, children,
+                (int) ((double)amount * populationGeneratorPercentage));
 
-        parents.removeAll(newPopulationOne);
+        population.removeAll(newPopulationOne);
         children.removeAll(newPopulationOne);
 
-        List<GameClass> newPopulationTwo = populationGeneratorTwo.generateFromCurrentPopulation(parents, children,
-                (int) ((double)populationAmountToSelect * (1.0 - populationGeneratorPercentage)));
+        List<GameClass> newPopulationTwo = populationGeneratorTwo.generateFromCurrentPopulation(population, children,
+                (int) ((double)amount * (1.0 - populationGeneratorPercentage)));
 
-        List<GameClass> population = new ArrayList<>();
-        population.addAll(newPopulationOne);
-        population.addAll(newPopulationTwo);
+        List<GameClass> populationToReturn = new ArrayList<>();
+        populationToReturn.addAll(newPopulationOne);
+        populationToReturn.addAll(newPopulationTwo);
 
-        return population;
+        return populationToReturn;
     }
 
     private static List<GameClass> generateInitialPopulation() throws IOException {
