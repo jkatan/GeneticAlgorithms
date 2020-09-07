@@ -62,18 +62,15 @@ public class FindBestCombination {
         properties.load(new FileInputStream(geneticAlgConfigPath));
 
 
-        double geneMutationProbability = 0.8;
-
         initialPopulationSize = Integer.parseInt(properties.getProperty("initialPopSize"));
 
-        armasFile = new File("src/equipment/tsvs" + properties.getProperty("equipmentWeapons"));
-        botasFile = new File("src/equipment/tsvs" + properties.getProperty("equipmentBoots"));
-        cascosFile = new File("src/equipment/tsvs" + properties.getProperty("equipmentHelms"));
-        guantesFile = new File("src/equipment/tsvs" + properties.getProperty("equipmentGloves"));
-        pecherasFile = new File("src/equipment/tsvs" + properties.getProperty("equipmentCuirass"));
+        armasFile = new File("src/equipment/tsvs/" + properties.getProperty("equipmentWeapons"));
+        botasFile = new File("src/equipment/tsvs/" + properties.getProperty("equipmentBoots"));
+        cascosFile = new File("src/equipment/tsvs/" + properties.getProperty("equipmentHelms"));
+        guantesFile = new File("src/equipment/tsvs/" + properties.getProperty("equipmentGloves"));
+        pecherasFile = new File("src/equipment/tsvs/" + properties.getProperty("equipmentCuirass"));
 
         classSelection = properties.getProperty("class");
-        String significant = properties.getProperty("significant");
 
         currentGeneration = Integer.parseInt(properties.getProperty("startingGeneration"));
 
