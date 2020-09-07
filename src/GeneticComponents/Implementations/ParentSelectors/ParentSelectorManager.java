@@ -8,6 +8,19 @@ import java.util.List;
 
 public class ParentSelectorManager {
 
+    public static GameClass getBestIndividual(List<GameClass> individuals) {
+        double maxPerformance = 0.0;
+        GameClass bestIndividual = null;
+        for (GameClass individual : individuals) {
+            if (individual.getBestPerformance() > maxPerformance) {
+                maxPerformance = individual.getBestPerformance();
+                bestIndividual = individual;
+            }
+        }
+
+        return bestIndividual;
+    }
+
     public static List<GameClass> rouletteWheelSelect(List<GameClass> population, int parentsAmount,
               List<Double> accumulatedRelativeFitnesses, List<Double> randomNumbers) {
 

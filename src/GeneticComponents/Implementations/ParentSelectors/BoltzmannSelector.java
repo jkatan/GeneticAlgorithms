@@ -32,31 +32,6 @@ public class BoltzmannSelector implements ParentSelector {
         List<Double> accumulatedRelativeFitnesses = ParentSelectorManager.calculateAccumulatedRelativeFitnesses(relativeFitnesses);
         List<Double> randomNumbers = ParentSelectorManager.generateRandomNumbers(parentsAmount);
 
-        System.out.println("Original fitnesses: ");
-        for (GameClass individual : population) {
-            System.out.println(individual.getBestPerformance());
-        }
-
-        System.out.println("Pseudo fitnesses: ");
-        for (Double pseudoFit : pseudoFitnesses) {
-            System.out.println(pseudoFit);
-        }
-
-        System.out.println("Relative fitnesses: ");
-        for (Double relFit : relativeFitnesses) {
-            System.out.println(relFit);
-        }
-
-        System.out.println("Cummulative fitnesses: ");
-        for (Double acummFit : accumulatedRelativeFitnesses) {
-            System.out.println(acummFit);
-        }
-
-        System.out.println("Random numbers: ");
-        for (Double randNum : randomNumbers) {
-            System.out.println(randNum);
-        }
-
         return ParentSelectorManager.rouletteWheelSelect(population, parentsAmount,
                 accumulatedRelativeFitnesses, randomNumbers);
     }

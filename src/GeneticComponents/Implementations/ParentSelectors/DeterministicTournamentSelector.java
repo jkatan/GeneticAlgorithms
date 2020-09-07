@@ -24,27 +24,13 @@ public class DeterministicTournamentSelector implements ParentSelector {
             List<GameClass> randomlyPickedIndividuals = new ArrayList<>();
             for (int j=0; j<ammountOfTournamentParticipants; j++) {
                 int randomIndex = (int) Math.ceil(Utils.getRandomInRange(0.0, populationCopy.size() - 1));
-                randomlyPickedIndividuals.add(populationCopy.get(randomIndex));
-                populationCopy.remove(randomIndex);
+                randomlyPickedIndividuals.add(populationCopy.remove(randomIndex));
             }
 
-            GameClass bestIndividual = getBestIndividual(randomlyPickedIndividuals);
+            GameClass bestIndividual = ParentSelectorManager.getBestIndividual(randomlyPickedIndividuals);
             parentsToSelect.add(bestIndividual);
         }
 
         return parentsToSelect;
-    }
-
-    private GameClass getBestIndividual(List<GameClass> individuals) {
-        double maxPerformance = 0.0;
-        GameClass bestIndividual = null;
-        for (GameClass individual : individuals) {
-            if (individual.getBestPerformance() > maxPerformance) {
-                maxPerformance = individual.getBestPerformance();
-                bestIndividual = individual;
-            }
-        }
-
-        return bestIndividual;
     }
 }
