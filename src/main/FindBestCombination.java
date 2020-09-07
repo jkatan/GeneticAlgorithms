@@ -75,30 +75,7 @@ public class FindBestCombination {
         classSelection = properties.getProperty("class");
         String significant = properties.getProperty("significant");
 
-        parentSelectorOne = new BoltzmannSelector(12.3, 5.78, 1.5);
-        currentGeneration = 0;
-        parentSelectorTwo = new EliteSelector();
-        parentSelectorPercentage = 0.5;
-        parentsAmountToSelect = 6;
-
-        crossoverManager = new CrossoverManager(new AnnularCrossover());
-        mutatorManager = new MutatorManager(new CompleteMutator(geneMutationProbability), armasFile, botasFile, cascosFile,
-                guantesFile, pecherasFile);
-        try {
-            List<GameClass> firstGeneration = generateInitialPopulation();
-            System.out.println("First generation individuals: ");
-            for (GameClass individual : firstGeneration) {
-                System.out.println(individual);
-            }
-            List<GameClass> parents = parentSelectorOne.selectParentsFromPopulation(firstGeneration, 7);
-            System.out.println("Selected parents: ");
-            for (GameClass parent : parents) {
-                System.out.println(parent);
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-        }
+        currentGeneration = Integer.parseInt(properties.getProperty("startingGeneration"));
 
         String value = properties.getProperty("value");
         switch (properties.getProperty("cutoff")) {
@@ -131,14 +108,23 @@ public class FindBestCombination {
                 parentSelectorOne = new EliteSelector();
                 break;
             case "roulette":
+                parentSelectorOne = new RouletteWheelSelector();
                 break;
             case "universal":
+                parentSelectorOne = new UniversalSelector();
                 break;
             case "boltzmann":
+                parentSelectorOne = new BoltzmannSelector(
+                        Double.parseDouble(properties.getProperty("t_0")),
+                        Double.parseDouble(properties.getProperty("t_c")),
+                        Double.parseDouble(properties.getProperty("k"))
+                );
                 break;
             case "dett":
+                parentSelectorOne = new DeterministicTournamentSelector(Integer.parseInt(properties.getProperty("nTourPart")));
                 break;
             case "probt":
+                parentSelectorOne = new ProbabilisticTournamentSelector();
                 break;
             default:
                 throw new IllegalArgumentException("No parent selector chosen for selector 1!");
@@ -148,17 +134,60 @@ public class FindBestCombination {
                 parentSelectorTwo = new EliteSelector();
                 break;
             case "roulette":
+                parentSelectorTwo = new RouletteWheelSelector();
                 break;
             case "universal":
+                parentSelectorTwo = new UniversalSelector();
                 break;
             case "boltzmann":
+                parentSelectorTwo = new BoltzmannSelector(
+                        Double.parseDouble(properties.getProperty("t_0")),
+                        Double.parseDouble(properties.getProperty("t_c")),
+                        Double.parseDouble(properties.getProperty("k"))
+                );
                 break;
             case "dett":
+                parentSelectorTwo = new DeterministicTournamentSelector(Integer.parseInt(properties.getProperty("nTourPart")));
                 break;
             case "probt":
+                parentSelectorTwo = new ProbabilisticTournamentSelector();
                 break;
             default:
                 throw new IllegalArgumentException("No parent selector chosen for selector 2!");
+        }
+
+        switch (properties.getProperty("mutation")) {
+            case "gen":
+                mutatorManager = new MutatorManager(new GeneMutator(Double.parseDouble(properties.getProperty("geneMutProb"))), armasFile, botasFile, cascosFile, guantesFile, pecherasFile);
+                break;
+            case "limmgen":
+                mutatorManager = new MutatorManager(new LimitedMultiGeneMutator(Double.parseDouble(properties.getProperty("geneMutProb"))), armasFile, botasFile, cascosFile, guantesFile, pecherasFile);
+                break;
+            case "unimgen":
+                mutatorManager = new MutatorManager(new UniformMultiGeneMutator(Double.parseDouble(properties.getProperty("geneMutProb"))), armasFile, botasFile, cascosFile, guantesFile, pecherasFile);
+                break;
+            case "complete":
+                mutatorManager = new MutatorManager(new CompleteMutator(Double.parseDouble(properties.getProperty("geneMutProb"))), armasFile, botasFile, cascosFile, guantesFile, pecherasFile);
+                break;
+            default:
+                throw new IllegalArgumentException("No mutator selected!");
+        }
+
+        // test?
+        try {
+            List<GameClass> firstGeneration = generateInitialPopulation();
+            System.out.println("First generation individuals: ");
+            for (GameClass individual : firstGeneration) {
+                System.out.println(individual);
+            }
+            List<GameClass> parents = parentSelectorOne.selectParentsFromPopulation(firstGeneration, 7);
+            System.out.println("Selected parents: ");
+            for (GameClass parent : parents) {
+                System.out.println(parent);
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
 
         switch (properties.getProperty("cross")) {
@@ -166,10 +195,13 @@ public class FindBestCombination {
                 crossoverManager = new CrossoverManager(new OnePointCrossover());
                 break;
             case "2pcross":
+                crossoverManager = new CrossoverManager(new TwoPointCrossover());
                 break;
             case "across":
+                crossoverManager = new CrossoverManager(new AnnularCrossover());
                 break;
             case "unicross":
+                crossoverManager = new CrossoverManager(new UniformCrossover());
                 break;
             default:
                 throw new IllegalArgumentException("No crossover chosen!");
