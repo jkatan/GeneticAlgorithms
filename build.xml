@@ -1,0 +1,28 @@
+<project>
+    <target name="clean">
+        <delete dir="build"/>
+        <delete file="GeneticEngine.jar"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="build/classes"/>
+        <javac srcdir="src" destdir="build/classes">
+            <classpath>
+                <pathelement path="libs/xchart-3.6.5/xchart-3.6.5.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jar">
+        <jar destfile="GeneticEngine.jar" basedir="build/classes">
+            <zipgroupfileset dir="libs/xchart-3.6.5" includes="xchart-3.6.5.jar"/>
+            <manifest>
+                <attribute name="Main-Class" value="main.FindBestCombination"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run">
+        <java jar="GeneticEngine.jar" fork="true"/>
+    </target>
+</project>

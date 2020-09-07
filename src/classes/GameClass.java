@@ -88,12 +88,11 @@ public abstract class GameClass {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         GameClass gameClass = (GameClass) o;
-        return Double.compare(gameClass.height, height) == 0 &&
-                Double.compare(gameClass.attack, attack) == 0 &&
-                Double.compare(gameClass.attackModifier, attackModifier) == 0 &&
-                Double.compare(gameClass.defense, defense) == 0 &&
-                Double.compare(gameClass.defenseModifier, defenseModifier) == 0 &&
-                equipment.equals(gameClass.equipment);
+        return Math.abs(gameClass.height - height) <= 0.2 &&
+                Math.abs(gameClass.attack - attack) <= 0.5 &&
+                Math.abs(gameClass.attackModifier - attackModifier) <= 0.5 &&
+                Math.abs(gameClass.defense - defense) <= 0.5 &&
+                Math.abs(gameClass.defenseModifier - defenseModifier) <= 0.5;
     }
 
     @Override
