@@ -1,6 +1,9 @@
 package GeneticComponents.Implementations.ConditionCheckers;
 
 import GeneticComponents.Interfaces.ConditionChecker;
+import classes.GameClass;
+
+import java.util.List;
 
 public class AcceptableSolutionConditionChecker implements ConditionChecker {
     private final double fitness;
@@ -17,12 +20,28 @@ public class AcceptableSolutionConditionChecker implements ConditionChecker {
     }
 
     @Override
-    public void update(Double newValue) {
-        maxFitnessInGeneration = newValue;
+    public void update(List<GameClass> population) {
+        maxFitnessInGeneration = getBestFitness(population);
+    }
+
+    @Override
+    public boolean requiresFitnessToUpdate() {
+        return true;
     }
 
     @Override
     public boolean isConditionMet() {
         return maxFitnessInGeneration >= fitness;
+    }
+
+    private double getBestFitness(List<GameClass> population) {
+        double bestFitness = 0;
+        for (GameClass i: population) {
+            double individualFitness = i.getBestPerformance();
+            if (individualFitness > bestFitness) {
+                bestFitness = individualFitness;
+            }
+        }
+        return bestFitness;
     }
 }

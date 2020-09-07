@@ -4,6 +4,7 @@ import equipment.Equipment;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class GameClass {
     protected double height;
@@ -81,4 +82,22 @@ public abstract class GameClass {
     }
 
     public abstract double getBestPerformance();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GameClass gameClass = (GameClass) o;
+        return Double.compare(gameClass.height, height) == 0 &&
+                Double.compare(gameClass.attack, attack) == 0 &&
+                Double.compare(gameClass.attackModifier, attackModifier) == 0 &&
+                Double.compare(gameClass.defense, defense) == 0 &&
+                Double.compare(gameClass.defenseModifier, defenseModifier) == 0 &&
+                equipment.equals(gameClass.equipment);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(height, equipment, attack, attackModifier, defense, defenseModifier);
+    }
 }

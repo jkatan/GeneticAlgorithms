@@ -1,6 +1,9 @@
 package GeneticComponents.Implementations.ConditionCheckers;
 
 import GeneticComponents.Interfaces.ConditionChecker;
+import classes.GameClass;
+
+import java.util.List;
 
 public class GenerationConditionChecker implements ConditionChecker {
     private final int maxGenerations;
@@ -16,8 +19,13 @@ public class GenerationConditionChecker implements ConditionChecker {
     }
 
     @Override
-    public void update(Double newValue) {
+    public void update(List<GameClass> population) {
         currentGeneration += 1;
+    }
+
+    @Override
+    public boolean requiresFitnessToUpdate() {
+        return false;
     }
 
     @Override

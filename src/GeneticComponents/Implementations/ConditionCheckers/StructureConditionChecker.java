@@ -1,11 +1,16 @@
 package GeneticComponents.Implementations.ConditionCheckers;
 
 import GeneticComponents.Interfaces.ConditionChecker;
+import classes.GameClass;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class StructureConditionChecker implements ConditionChecker {
     private final int maxGenerationsWithoutChanges;
     private final double significantPercentage;
     private int amountOfGenerationsWithoutChanges;
+    private List<GameClass> lastPopulation;
 
     public StructureConditionChecker(int nGenerations, double significantPercentage) {
         this.maxGenerationsWithoutChanges = nGenerations;
@@ -21,16 +26,28 @@ public class StructureConditionChecker implements ConditionChecker {
         amountOfGenerationsWithoutChanges = 0;
     }
 
-    /**
-     * Amount of population that changed.
-     * @param newValue The percentage of population that changed from last generation.
-     */
     @Override
-    public void update(Double newValue) {
-        amountOfGenerationsWithoutChanges++;
-        if (newValue < significantPercentage) {
-            amountOfGenerationsWithoutChanges = 0;
+    public void update(List<GameClass> population) {
+        int repeatedIndividuals = 0;
+        if (lastPopulation != null) {
+            for (GameClass i: population) {
+                for (GameClass j: lastPopulation) {
+                    if (i.equals(j)) {
+                        repeatedIndividuals++;
+                    }
+                }
+            }
+            amountOfGenerationsWithoutChanges++;
+            if ((repeatedIndividuals / (double) population.size()) < significantPercentage) {
+                amountOfGenerationsWithoutChanges = 0;
+            }
         }
+        lastPopulation = new LinkedList<>(population);
+    }
+
+    @Override
+    public boolean requiresFitnessToUpdate() {
+        return true;
     }
 
     @Override

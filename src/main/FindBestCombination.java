@@ -54,9 +54,7 @@ public class FindBestCombination {
 
     private static int currentGeneration;
 
-    // Lo que esta en este main son solo cosas que estuve testeando y que luego se reemplazara
-    // por la lectura del archivo de configuracion, asi que puedes ignorar esta parte.
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         String geneticAlgConfigPath = "src/config.properties";
         final Properties properties = new Properties();
         properties.load(new FileInputStream(geneticAlgConfigPath));
@@ -75,7 +73,8 @@ public class FindBestCombination {
         currentGeneration = Integer.parseInt(properties.getProperty("startingGeneration"));
 
         String value = properties.getProperty("value");
-        switch (properties.getProperty("cutoff")) {
+        String cutoff = properties.getProperty("cutoff");
+        switch (cutoff) {
             case "time":
                 conditionChecker = new TimeConditionChecker(Double.parseDouble(value));
                 break;
@@ -155,36 +154,27 @@ public class FindBestCombination {
 
         switch (properties.getProperty("mutation")) {
             case "gen":
-                mutatorManager = new MutatorManager(new GeneMutator(Double.parseDouble(properties.getProperty("geneMutProb"))), armasFile, botasFile, cascosFile, guantesFile, pecherasFile);
+                mutatorManager = new MutatorManager(
+                        new GeneMutator(Double.parseDouble(properties.getProperty("geneMutProb"))),
+                        armasFile, botasFile, cascosFile, guantesFile, pecherasFile);
                 break;
             case "limmgen":
-                mutatorManager = new MutatorManager(new LimitedMultiGeneMutator(Double.parseDouble(properties.getProperty("geneMutProb"))), armasFile, botasFile, cascosFile, guantesFile, pecherasFile);
+                mutatorManager = new MutatorManager(
+                        new LimitedMultiGeneMutator(Double.parseDouble(properties.getProperty("geneMutProb"))),
+                        armasFile, botasFile, cascosFile, guantesFile, pecherasFile);
                 break;
             case "unimgen":
-                mutatorManager = new MutatorManager(new UniformMultiGeneMutator(Double.parseDouble(properties.getProperty("geneMutProb"))), armasFile, botasFile, cascosFile, guantesFile, pecherasFile);
+                mutatorManager = new MutatorManager(
+                        new UniformMultiGeneMutator(Double.parseDouble(properties.getProperty("geneMutProb"))),
+                        armasFile, botasFile, cascosFile, guantesFile, pecherasFile);
                 break;
             case "complete":
-                mutatorManager = new MutatorManager(new CompleteMutator(Double.parseDouble(properties.getProperty("geneMutProb"))), armasFile, botasFile, cascosFile, guantesFile, pecherasFile);
+                mutatorManager = new MutatorManager(
+                        new CompleteMutator(Double.parseDouble(properties.getProperty("geneMutProb"))),
+                        armasFile, botasFile, cascosFile, guantesFile, pecherasFile);
                 break;
             default:
                 throw new IllegalArgumentException("No mutator selected!");
-        }
-
-        // test?
-        try {
-            List<GameClass> firstGeneration = generateInitialPopulation();
-            System.out.println("First generation individuals: ");
-            for (GameClass individual : firstGeneration) {
-                System.out.println(individual);
-            }
-            List<GameClass> parents = parentSelectorOne.selectParentsFromPopulation(firstGeneration, 7);
-            System.out.println("Selected parents: ");
-            for (GameClass parent : parents) {
-                System.out.println(parent);
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
         }
 
         switch (properties.getProperty("cross")) {
@@ -204,7 +194,7 @@ public class FindBestCombination {
                 throw new IllegalArgumentException("No crossover chosen!");
         }
 
-        //findBestCombination();
+        findBestCombination();
     }
 
     public static int getCurrentGeneration() {
@@ -223,10 +213,11 @@ public class FindBestCombination {
             mutatorManager.mutate(children);
             population = selectNextGeneration(parents, children);
 
-
-            // do I need to do this here? or in update?
-            currentGeneration++;
-            // todo: add call to conditionChecker.update(something)
+            if (conditionChecker.requiresFitnessToUpdate()) {
+                conditionChecker.update(population);
+            } else {
+                conditionChecker.update(null);
+            }
         }
     }
 

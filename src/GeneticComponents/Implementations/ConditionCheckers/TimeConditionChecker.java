@@ -1,6 +1,9 @@
 package GeneticComponents.Implementations.ConditionCheckers;
 
 import GeneticComponents.Interfaces.ConditionChecker;
+import classes.GameClass;
+
+import java.util.List;
 
 public class TimeConditionChecker implements ConditionChecker {
 
@@ -17,8 +20,13 @@ public class TimeConditionChecker implements ConditionChecker {
     }
 
     @Override
-    public void update(Double newValue) {
+    public void update(List<GameClass> population) {
         // N/A with time
+    }
+
+    @Override
+    public boolean requiresFitnessToUpdate() {
+        return false;
     }
 
     @Override
