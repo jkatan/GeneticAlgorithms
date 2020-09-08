@@ -296,6 +296,18 @@ public class FindBestCombination {
             chart.updateXYSeries("graph", data[0], data[1], null);
             sw.repaintChart();
         }
+
+        double maxPerformance = 0.0;
+        GameClass bestIndividual = null;
+        for (GameClass individual : population) {
+            if (individual.getBestPerformance() > maxPerformance) {
+                maxPerformance = individual.getBestPerformance();
+                bestIndividual = individual;
+            }
+        }
+
+        System.out.println("Best individual: ");
+        System.out.println(bestIndividual);
     }
 
     private static double[][] getGraphData() {
